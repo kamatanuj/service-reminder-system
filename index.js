@@ -199,6 +199,81 @@ export default {
         });
       }
       
+      // Admin: Setup Calendar Page
+      if (path === '/admin/setup-calendar') {
+        return new Response(setupCalendarHTML, {
+          headers: { 
+            'Content-Type': 'text/html',
+            'Cache-Control': 'no-cache'
+          }
+        });
+      }
+      
+      // Admin: Calendar Status
+      if (path === '/admin/calendar-status') {
+        return jsonResponse({
+          success: true,
+          connected: false,
+          message: '❌ Owner calendar not connected. Visit /admin/setup-calendar to connect.',
+          note: 'For full Google Calendar integration, the garage owner needs to complete OAuth setup.'
+        });
+      }
+      
+      // Admin: OAuth Callback (placeholder)
+      if (path === '/auth/google/callback') {
+        const code = url.searchParams.get('code');
+        const error = url.searchParams.get('error');
+        
+        if (error) {
+          return new Response(`
+            <!DOCTYPE html>
+            <html><body style="font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px;">
+              <h1 style="color: #dc3545;">❌ Authorization Failed</h1>
+              <p>Error: ${error}</p>
+              <p><a href="/admin/setup-calendar">Try again</a></p>
+            </body></html>
+          `, { headers: { 'Content-Type': 'text/html' }});
+        }
+        
+        if (!code) {
+          return jsonResponse({ error: 'Authorization code missing' }, 400);
+        }
+        
+        return new Response(`
+          <!DOCTYPE html>
+          <html><head><title>Setup Complete</title>
+          <style>
+            body { font-family: Arial; max-width: 600px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+            .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            h1 { color: #28a745; }
+            .token-box { background: #f8f9fa; border: 2px solid #28a745; padding: 20px; border-radius: 5px; margin: 20px 0; font-family: monospace; word-break: break-all; }
+            .warning { background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin: 20px 0; color: #856404; }
+            .btn { display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px; }
+          </style></head>
+          <body>
+            <div class="card">
+              <h1>✅ Authorization Code Received</h1>
+              <p>Your Google Calendar authorization was successful!</p>
+              <div class="warning">
+                <strong>🔑 IMPORTANT:</strong>
+                <p>This is a demo environment. In production, the system would automatically exchange this code for a refresh token.</p>
+              </div>
+              <div class="token-box">
+                Authorization Code: ${code}
+              </div>
+              <p><strong>Next Steps for Production:</strong></p>
+              <ol>
+                <li>This code should be exchanged for a refresh token</li>
+                <li>Store the refresh token securely</li>
+                <li>Add it to your environment variables</li>
+                <li>Restart the server</li>
+              </ol>
+              <a href="/" class="btn">Go to Dashboard</a>
+            </div>
+          </body></html>
+        `, { headers: { 'Content-Type': 'text/html' }});
+      }
+      
       // Serve booking form
       if (path === '/' || path === '/booking' || path.match(/^\/booking\/[^\/]+$/)) {
         return new Response(bookingHTML, {
@@ -228,6 +303,145 @@ function jsonResponse(data, status = 200) {
     }
   });
 }
+
+const setupCalendarHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Garage Calendar</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    .card-shadow { box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="gradient-bg text-white py-6">
+    <div class="container mx-auto px-4">
+      <div class="flex items-center space-x-3">
+        <span class="text-3xl">📅</span>
+        <div>
+          <h1 class="text-xl font-bold">Google Calendar Setup</h1>
+          <p class="text-sm opacity-80">Service Reminder System</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="bg-white rounded-2xl card-shadow p-8 mb-6">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">🔧 Setup Garage Owner Calendar</h2>
+      
+      <p class="text-gray-600 mb-6">
+        Connect your Google Calendar to automatically receive all customer bookings.
+        This is a one-time setup that takes 2 minutes.
+      </p>
+
+      <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 rounded">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <span class="text-yellow-400">⚠️</span>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-yellow-700">
+              <strong>Important:</strong> Make sure you're logged into the <strong>garage owner's Google account</strong> before proceeding.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4 mb-8">
+        <h3 class="text-lg font-semibold text-gray-800">What happens next:</h3>
+        <ol class="list-decimal list-inside space-y-2 text-gray-600">
+          <li>Click "Connect Google Calendar" below</li>
+          <li>Sign in with the garage owner's Google account</li>
+          <li>Grant calendar access permission</li>
+          <li>Copy the refresh token shown</li>
+          <li>Add it to your environment variables</li>
+        </ol>
+      </div>
+
+      <div class="bg-blue-50 rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-blue-800 mb-2">📋 Setup Checklist</h3>
+        <ul class="space-y-2 text-blue-700">
+          <li class="flex items-center">
+            <span class="mr-2">✅</span>
+            Google Cloud Console project created
+          </li>
+          <li class="flex items-center">
+            <span class="mr-2">✅</span>
+            Google Calendar API enabled
+          </li>
+          <li class="flex items-center">
+            <span class="mr-2">✅</span>
+            OAuth 2.0 credentials created
+          </li>
+          <li class="flex items-center text-gray-400">
+            <span class="mr-2">⏳</span>
+            Owner authorization (this step)
+          </li>
+          <li class="flex items-center text-gray-400">
+            <span class="mr-2">⏳</span>
+            Add refresh token to environment
+          </li>
+        </ul>
+      </div>
+
+      <div class="bg-gray-50 rounded-lg p-6 mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">🔐 Required Scopes</h3>
+        <p class="text-gray-600 mb-2">The system needs permission to:</p>
+        <ul class="list-disc list-inside space-y-1 text-gray-600">
+          <li>View and manage your Google Calendar</li>
+          <li>Create events on your behalf</li>
+          <li>Send calendar invites to customers</li>
+        </ul>
+      </div>
+
+      <a href="#" onclick="startSetup()" 
+        class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg transition text-center">
+        📅 Connect Google Calendar
+      </a>
+
+      <div id="setup-info" class="hidden mt-6 bg-gray-50 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">⚠️ Setup Required</h3>
+        <p class="text-gray-600 mb-4">
+          To complete the Google Calendar integration, you need to:
+        </p>
+        <ol class="list-decimal list-inside space-y-2 text-gray-600">
+          <li>Create a project in <a href="https://console.cloud.google.com" target="_blank" class="text-blue-600 hover:underline">Google Cloud Console</a></li>
+          <li>Enable the Google Calendar API</li>
+          <li>Create OAuth 2.0 credentials</li>
+          <li>Add the client ID and secret to environment variables</li>
+          <li>Then return to this page to authorize</li>
+        </ol>
+        
+        <div class="mt-4 p-4 bg-blue-50 rounded">
+          <p class="text-sm text-blue-800">
+            <strong>Note:</strong> This is a demo environment. In production, this button would redirect to Google OAuth.
+          </p>
+        </div>
+      </div>
+
+      <p class="mt-6 text-sm text-gray-500 text-center">
+        After setup, all customer bookings will automatically appear in your Google Calendar.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function startSetup() {
+      const info = document.getElementById('setup-info');
+      info.classList.remove('hidden');
+      
+      // In production, this would redirect to Google OAuth
+      // window.location.href = '/auth/google';
+    }
+  </script>
+</body>
+</html>`;
 
 const bookingHTML = `<!DOCTYPE html>
 <html lang="en">
