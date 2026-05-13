@@ -1,0 +1,17 @@
+name = "service-reminder"
+main = "index.js"
+compatibility_date = "2026-05-13"
+
+[vars]
+NODE_ENV = "production"
+BASE_URL = "https://service-reminder.kamatanuj.workers.dev"
+
+# Secrets (set via wrangler secret put)
+# MONGODB_URI
+# SENDGRID_API_KEY
+# GOOGLE_CLIENT_ID
+# GOOGLE_CLIENT_SECRET
+# GOOGLE_REFRESH_TOKEN
+# ADMIN_API_KEY
+# FROM_EMAIL
+# FROM_NAME
