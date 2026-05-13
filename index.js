@@ -141,6 +141,15 @@ export default {
           // Store booking
           bookings.set(bookingId, booking);
           
+          // Generate Google Calendar link
+          const calendarDate = body.booking_date.replace(/-/g, '');
+          const [startHour, startMin] = body.time_slot.split(':');
+          const startTime = startHour + startMin + '00';
+          const endHour = (parseInt(startHour) + 2).toString().padStart(2, '0');
+          const endTime = endHour + startMin + '00';
+          
+          const calendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('🔧 Service: ' + (body.service_type || 'Annual Service'))}&dates=${calendarDate}T${startTime}/${calendarDate}T${endTime}&details=${encodeURIComponent('Service appointment booked through Service Reminder System')}&location=${encodeURIComponent('Automotive Garage')}`;
+          
           return jsonResponse({
             success: true,
             message: 'Booking confirmed!',
@@ -149,7 +158,7 @@ export default {
               customer_id: uuid,
               booking_date: body.booking_date,
               time_slot: body.time_slot,
-              calendar_link: 'https://calendar.google.com/calendar/render'
+              calendar_link: calendarLink
             }
           });
         }
@@ -486,9 +495,8 @@ const bookingHTML = `<!DOCTYPE html>
           document.getElementById('success-time').textContent = formatTime(formData.time_slot);
           document.getElementById('success-service').textContent = document.getElementById('service-type').options[document.getElementById('service-type').selectedIndex].text;
 
-          if (data.booking.calendar_link) {
-            document.getElementById('calendar-link').href = data.booking.calendar_link;
-          }
+          document.getElementById('calendar-link').href = data.booking.calendar_link;
+          document.getElementById('calendar-link').textContent = '📅 Add to Google Calendar';
 
           showNotification('✅ Booking confirmed! Check your email.');
         } else {
