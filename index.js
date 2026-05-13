@@ -400,7 +400,7 @@ const setupCalendarHTML = `<!DOCTYPE html>
         </ul>
       </div>
 
-      <a href="#" onclick="startSetup()" 
+      <a href="https://accounts.google.com/o/oauth2/v2/auth?client_id=837392457890-b4f728tmuimh69ds5up5ttpa712l9kej.apps.googleusercontent.com&redirect_uri=https%3A%2F%2Fservice-reminder.kamatanuj.workers.dev%2Fauth%2Fgoogle%2Fcallback&response_type=code&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar%20https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events&access_type=offline&prompt=consent&include_granted_scopes=true" 
         class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 rounded-lg transition text-center">
         📅 Connect Google Calendar
       </a>
@@ -411,11 +411,11 @@ const setupCalendarHTML = `<!DOCTYPE html>
           To complete the Google Calendar integration, you need to:
         </p>
         <ol class="list-decimal list-inside space-y-2 text-gray-600">
-          <li>Create a project in <a href="https://console.cloud.google.com" target="_blank" class="text-blue-600 hover:underline">Google Cloud Console</a></li>
-          <li>Enable the Google Calendar API</li>
-          <li>Create OAuth 2.0 credentials</li>
-          <li>Add the client ID and secret to environment variables</li>
-          <li>Then return to this page to authorize</li>
+          <li>Click "Connect Google Calendar" above</li>
+          <li>Sign in with the garage owner's Google account</li>
+          <li>Grant calendar access permission</li>
+          <li>Copy the refresh token shown on the next page</li>
+          <li>Add it to your environment variables</li>
         </ol>
         
         <div class="mt-4 p-4 bg-blue-50 rounded">
@@ -430,16 +430,6 @@ const setupCalendarHTML = `<!DOCTYPE html>
       </p>
     </div>
   </div>
-
-  <script>
-    function startSetup() {
-      const info = document.getElementById('setup-info');
-      info.classList.remove('hidden');
-      
-      // In production, this would redirect to Google OAuth
-      // window.location.href = '/auth/google';
-    }
-  </script>
 </body>
 </html>`;
 
