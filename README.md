@@ -48,6 +48,8 @@ npm run setup-db
 npm start
 ```
 
+**Server will start at:** http://localhost:3001 (Port 3001 to avoid conflicts)
+
 ## 📁 Project Structure
 
 ```
@@ -91,7 +93,7 @@ service-reminder-system/
 | `GOOGLE_CLIENT_SECRET` | Google OAuth secret | ✅ |
 | `GOOGLE_REFRESH_TOKEN` | Google refresh token | ✅ |
 | `GOOGLE_CALENDAR_ID` | Calendar ID (default: primary) | ✅ |
-| `BASE_URL` | Application base URL | ✅ |
+| `PORT` | Server port (default: 3001) | ⚠️ Change if 3000 is in use |
 | `ADMIN_API_KEY` | Admin API key | ✅ |
 
 ## 📧 Email Flow
